@@ -31,7 +31,7 @@ export function Chat() {
     {
       id: "1",
       role: "assistant",
-      content: "Hello! Welcome to The Skin Clinic Med Spa. How can I assist you today?",
+      content: "Hello! I am the AI Customer Support Agent at Skin Clinic Med Spa. How can I assist you today?",
     },
   ]);
 
