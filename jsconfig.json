@@ -2,6 +2,11 @@
   "compilerOptions": {
     "paths": {
       "@/*": ["./*"]
+<<<<<<< Updated upstream
     }
+=======
+    },
+    "jsx": "react" // or "react-jsx"
+>>>>>>> Stashed changes
   }
 }

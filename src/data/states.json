@@ -1,0 +1,78 @@
+{
+  "services": [
+    {
+      "name": "Botox and Fillers",
+      "description": "We offer Botox and Fillers to help reduce wrinkles and fine lines. Our experienced practitioners ensure a safe and comfortable experience."
+    },
+    {
+      "name": "Fat Dissolving",
+      "description": "Our fat dissolving treatments target and reduce stubborn fat areas, offering a non-surgical solution for body contouring."
+    },
+    {
+      "name": "Laser Hair Removal",
+      "description": "We provide laser hair removal services that offer a long-term solution for unwanted hair with minimal discomfort."
+    },
+    {
+      "name": "Microneedling",
+      "description": "Microneedling is a cosmetic procedure that helps rejuvenate the skin by stimulating collagen production."
+    },
+    {
+      "name": "CO2 Laser Resurfacing",
+      "description": "CO2 Laser Resurfacing helps reduce scars, wrinkles, and other skin irregularities by removing layers of skin tissue in a fractionated method."
+    },
+    {
+      "name": "Peels and Facials",
+      "description": "Our range of peels and facials are designed to cleanse, exfoliate, and nourish the skin, promoting a clear, well-hydrated complexion."
+    },
+    {
+      "name": "PRP Hair Restoration",
+      "description": "Platelet-Rich Plasma (PRP) Hair Restoration uses your blood's growth factors to stimulate hair growth and improve hair thickness."
+    },
+    {
+      "name": "Sculptra",
+      "description": "Sculptra is an injectable treatment that stimulates collagen production to restore facial volume and reduce wrinkles."
+    }
+  ],
+  "booking": {
+    "online": "https://skinclinicmedspa.zenoti.com/WebstoreNew",
+    "phone": "951-588-8699",
+    "text": "951-666-0681"
+  },
+  "memberships": [
+    {
+      "name": "The Banking Club",
+      "description": "A premium membership offering exclusive discounts and benefits for our most loyal customers."
+    },
+    {
+      "name": "Glow Getter",
+      "description": "The Glow Getter membership provides access to regular skin treatments to keep your complexion radiant."
+    },
+    {
+      "name": "Team Microneedling",
+      "description": "Join the Team Microneedling membership to enjoy discounts on regular microneedling sessions."
+    },
+    {
+      "name": "Hollywood Spectra Laser Club",
+      "description": "Exclusive membership for those who regularly use our Hollywood Spectra Laser treatments."
+    },
+    {
+      "name": "Club Vivace",
+      "description": "Club Vivace offers members access to our advanced Vivace RF Microneedling treatments at a discounted rate."
+    }
+  ],
+  "promotions": [
+    {
+      "name": "Raffle for Free Botox for 2024",
+      "description": "Enter our raffle to win free Botox treatments for the entirety of 2024!"
+    },
+    {
+      "name": "Black Friday Sale",
+      "description": "Don't miss out on our biggest sale of the year during Black Friday! Exclusive discounts on all services."
+    }
+  ],
+  "contact_information": {
+    "name": "THE SKIN CLINIC MED SPA",
+    "email": "skinclinic@skinclinicmedspa.com",
+    "address": "6927 Brockton Ave. Suite 1A, Riverside, CA 92506"
+  }
+}

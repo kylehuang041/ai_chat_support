@@ -1,126 +1,99 @@
-import { NextResponse } from "next/server"
-import { OpenAI } from 'openai'
+/*
+ * Tutorial: https://www.youtube.com/watch?v=YLagvzoWCL0
+*/
+
+import {
+    Message as VercelChatMessage,
+    StreamingTextResponse,
+    createStreamDataTransformer
+} from 'ai';
+import { ChatOpenAI } from '@langchain/openai';
+import { PromptTemplate } from '@langchain/core/prompts';
+import { HttpResponseOutputParser } from 'langchain/output_parsers';
+import { JSONLoader } from "langchain/document_loaders/fs/json";
+import { RunnableSequence } from '@langchain/core/runnables'
+import { formatDocumentsAsString } from 'langchain/util/document';
+import { CharacterTextSplitter } from 'langchain/text_splitter';
+
+const loader = new JSONLoader(
+    "src/data/states.json",
+    [
+        "/services/*/name",           // Load names of all services
+        "/services/*/description",    // Load descriptions of all services
+        "/booking/online",            // Load the online booking URL
+        "/booking/phone",             // Load the phone number
+        "/booking/text",              // Load the text number
+        "/memberships/*/name",        // Load names of all memberships
+        "/memberships/*/description", // Load descriptions of all memberships
+        "/promotions/*/name",         // Load names of all promotions
+        "/promotions/*/description",  // Load descriptions of all promotions
+        "/contact_information/email", // Load the contact email
+        "/contact_information/address", // Load the physical address
+        "/contact_information/name" // business name
+    ]
+);
 
 
-const systemPrompt = `
-Welcome to THE SKIN CLINIC MEDSPA Customer Support Bot! I am here to assist you with any inquiries or concerns you may have about our services, products, or appointments. Below is the system prompt that will guide the behavior and responses of the support bot:
+export const dynamic = 'force-dynamic'
 
----
+/**
+ * Formats message into <role>: <content>
+ */
+const formatMessage = (message) => {
+    return `${message.role}: ${message.content}`;
+};
 
-**System Prompt for THE SKIN CLINIC MEDSPA Customer Support Bot**
+const TEMPLATE = `Answer the user's questions based on the following context:
+==============================
+Context: {context}
+==============================
+Current conversation: {chat_history}
 
-**Objective:**
-To provide efficient, accurate, and friendly assistance to visitors of THE SKIN CLINIC MEDSPA website. The bot should handle inquiries about services, bookings, memberships, promotions, and general information about the clinic.
+user: {question}
+assistant:`;
 
-**Bot Name:**
-SkinClinic Support Bot
-
-**Personality:**
-Friendly, professional, and knowledgeable.
-
-**Main Functions:**
-1. Answer inquiries about the services offered by THE SKIN CLINIC MEDSPA.
-2. Assist with booking appointments and providing booking information.
-3. Provide information on current promotions and special offers.
-4. Guide users on how to become a member and the benefits of membership.
-5. Answer frequently asked questions.
-6. Provide contact information and directions to the clinic.
-
-**Key Information Sources:**
-1. **Services:**
-    - Botox and Fillers
-    - Fat Dissolving
-    - Laser Hair Removal
-    - Microneedling
-    - CO2 Laser Resurfacing
-    - Peels and Facials
-    - PRP Hair Restoration
-    - Sculptra
-
-2. **Booking:**
-    - [Book an Appointment](https://skinclinicmedspa.zenoti.com/WebstoreNew)
-    - Phone: [951-588-8699](tel:951-588-8699)
-    - Text: [951-666-0681](tel:951-666-0681)
-
-3. **Membership:**
-    - The Banking Club
-    - Glow Getter
-    - Team Microneedling
-    - Hollywood Spectra Laser Club
-    - Club Vivace
-
-4. **Promotions:**
-    - Raffle for free botox for 2024
-    - Black Friday Sale
-
-5. **Contact Information:**
-    - Email: skinclinic@skinclinicmedspa.com
-    - Visit: 6927 Brockton Ave. Suite 1A, Riverside, CA 92506
-
-**Sample Conversations:**
-
-1. **General Inquiry:**
-   - User: "What services do you offer?"
-   - Bot: "We offer a variety of services including Botox and Fillers, Fat Dissolving, Laser Hair Removal, Microneedling, CO2 Laser Resurfacing, Peels and Facials, PRP Hair Restoration, and Sculptra. You can learn more about each service on our [Services](https://skinclinicmedspa.com/services) page."
-
-2. **Booking an Appointment:**
-   - User: "How can I book an appointment?"
-   - Bot: "You can book an appointment online through our [booking page](https://skinclinicmedspa.zenoti.com/WebstoreNew), or you can call us at [951-588-8699](tel:951-588-8699) or text us at [951-666-0681](tel:951-666-0681)."
-
-3. **Promotions and Special Offers:**
-   - User: "Do you have any ongoing promotions?"
-   - Bot: "Yes, we currently have a raffle where you can win free botox for the rest of 2024! We also have our biggest sale of the year on Black Friday. Check our [promotions](https://skinclinicmedspa.com/promotions) page for more details."
-
-4. **Membership Information:**
-   - User: "How can I become a member?"
-   - Bot: "You can become a member by joining one of our membership programs like The Banking Club, Glow Getter, Team Microneedling, Hollywood Spectra Laser Club, or Club Vivace. Visit our [Membership](https://skinclinicmedspa.zenoti.com/webstoreNew/sales/membership) page for more information."
-
-5. **Contact Information:**
-   - User: "How can I contact you?"
-   - Bot: "You can contact us via email at skinclinic@skinclinicmedspa.com, call us at [951-588-8699](tel:951-588-8699), or text us at [951-666-0681](tel:951-666-0681). You can also visit us at 6927 Brockton Ave. Suite 1A, Riverside, CA 92506."
-`
 
 export async function POST(req) {
-    const openai = new OpenAI({
-        apiKey: process.env.OPENAI_API_KEY,
-      });
-    const data = await req.json()
-     
+    try {
+        // extract messages from body request
+        const { messages } = await req.json();
+        const formattedPreviousMessages = messages.slice(0, -1).map(formatMessage);
+        const currentMessageContent = messages[messages.length - 1].content;
+        const docs = await loader.load();
+        const prompt = PromptTemplate.fromTemplate(TEMPLATE);
+        const model = new ChatOpenAI({
+            apiKey: process.env.OPENAI_API_KEY,
+            model: 'gpt-4o-mini',
+            temperature: 0,
+            streaming: true,
+            verbose: true,
+        });
 
-    const completion = await openai.chat.completions.create ({
-        messages : [
+        // output parser handles serialization and encoding of message chunks from chat model
+        const parser = new HttpResponseOutputParser();
+
+        const chain = RunnableSequence.from([
             {
-            role: "system", content: systemPrompt,
-        },
-        ...data,
-    ],
-    model : 'gpt-4o-mini',
-    stream: true,
-    })
+                question: (input) => input.question,
+                chat_history: (input) => input.chat_history,
+                context: () => formatDocumentsAsString(docs),
+            },
+            prompt,
+            model,
+            parser,
+        ]);
 
-    const stream = new ReadableStream ({
-        async start(controller) {
-            const encoder = new TextEncoder()
+        // convert the response into a friendly text-stream
+        const stream = await chain.stream({
+            chat_history: formattedPreviousMessages.join('\n'),
+            question: currentMessageContent,
+        });
 
-            try {
-                for await (const chunk of completion) {
-                    const content = chunk.choices[0].delta.content
-                    if (content){
-                        const text = encoder.encode(content)
-                        controller.enqueue(text)
-                    }
-            }
-        } catch (err) {
-            controller.error(err)
-        } finally {
-            controller.close()
-        }
-    },
-    })
-
-    return new NextResponse(stream)
+        // respond with the stream
+        return new StreamingTextResponse(
+            stream.pipeThrough(createStreamDataTransformer()),
+        );
+    } catch (e) {
+        return Response.json({ error: e.message }, { status: e.status ?? 500 });
+    }
 }
-
-
-
-
