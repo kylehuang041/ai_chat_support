@@ -12,7 +12,7 @@ import { formatDocumentsAsString } from 'langchain/util/document';
 import { CharacterTextSplitter } from 'langchain/text_splitter';
 
 const loader = new JSONLoader(
-    "src/data/states.json",
+    "./src/data/states.json",
     [
         "/services",           // Load names of all services
         "/booking",            // Load the online booking URL
