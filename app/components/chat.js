@@ -14,7 +14,6 @@ import {
 } from "@mui/material";
 import { useChat } from "ai/react";
 import { marked } from "marked";
-import { useRef, useEffect } from "react";
 import DOMPurify from "dompurify";
 import SendIcon from "@mui/icons-material/Send";
 import { avatarImg } from '../../data/index'
@@ -26,14 +25,6 @@ export function Chat() {
     onError: (e) => {
       console.log(e);
     },
-  });
-  const chatParent = useRef(null);
-
-  useEffect(() => {
-    const domNode = chatParent.current;
-    if (domNode) {
-      domNode.scrollTop = domNode.scrollHeight;
-    }
   });
 
   return (
