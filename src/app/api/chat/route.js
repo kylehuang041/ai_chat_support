@@ -10,9 +10,17 @@ import { JSONLoader } from "langchain/document_loaders/fs/json";
 import { RunnableSequence } from '@langchain/core/runnables'
 import { formatDocumentsAsString } from 'langchain/util/document';
 import { CharacterTextSplitter } from 'langchain/text_splitter';
+import path from 'path'
+import fs from 'fs'
+
+const filePath = path.resolve(process.cwd(), './src/data/states.json')
+
+if (!fs.existsSync(filePath)) {
+    throw new Error('File not found: ' + filePath)
+}
 
 const loader = new JSONLoader(
-    "./src/data/states.json",
+    filePath,
     [
         "/services",           // Load names of all services
         "/booking",            // Load the online booking URL
