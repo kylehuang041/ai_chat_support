@@ -2,8 +2,6 @@
 
 import {
   Box,
-  Button,
-  Stack,
   TextField,
   Avatar,
   AppBar,
@@ -12,13 +10,14 @@ import {
   Container,
   IconButton,
   CssBaseline,
+  Stack,
 } from "@mui/material";
 import { useChat } from "ai/react";
 import { marked } from "marked";
 import DOMPurify from "dompurify";
 import SendIcon from "@mui/icons-material/Send";
-import { avatarImg } from '../../data/index'
-
+import { useEffect, useState } from "react";
+import { avatarImg } from "../../data/index";
 
 export function Chat() {
   const { messages, input, handleInputChange, handleSubmit } = useChat({
@@ -27,6 +26,17 @@ export function Chat() {
       console.log(e);
     },
   });
+
+  const [initialMessages, setInitialMessages] = useState([
+    {
+      id: "1",
+      role: "assistant",
+      content: "Hello! Welcome to The Skin Clinic Med Spa. How can I assist you today?",
+    },
+  ]);
+
+  // Combine initialMessages with any new messages
+  const combinedMessages = [...initialMessages, ...messages];
 
   return (
     <>
@@ -71,7 +81,7 @@ export function Chat() {
             }}
           >
             <Box sx={{ overflowY: "auto", px: 3, py: 2, flexGrow: 1 }}>
-              {messages.map((message, index) => {
+              {combinedMessages.map((message, index) => {
                 const isUser = message.role === "user";
                 return (
                   <Box
@@ -90,16 +100,16 @@ export function Chat() {
                     {!isUser && (
                       <Avatar
                         alt="Assistant"
-                        src={`/public/images/${avatarImg}`} // Fixed the avatar image path
+                        src={`/images/${avatarImg}`} // Fixed the avatar image path
                         sx={{ marginRight: 2 }}
                       />
                     )}
                     <Box
-                      bgcolor={isUser ? "grey.800" : "grey.500"}
+                      bgcolor={isUser ? "grey.500" : "grey.800"}
                       color="white"
                       borderRadius={16}
                       p={2}
-                      maxWidth="75%"
+                      maxWidth="70%"
                       dangerouslySetInnerHTML={{
                         __html: DOMPurify.sanitize(marked(message.content)),
                       }}
@@ -131,10 +141,7 @@ export function Chat() {
                   borderRadius: 2,
                 }}
               />
-              <IconButton
-                color="primary"
-                onClick={handleSubmit}
-              >
+              <IconButton color="primary" onClick={handleSubmit}>
                 <SendIcon />
               </IconButton>
             </Box>

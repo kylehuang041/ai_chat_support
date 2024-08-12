@@ -1,7 +1,3 @@
-/*
- * Tutorial: https://www.youtube.com/watch?v=YLagvzoWCL0
-*/
-
 import {
     Message as VercelChatMessage,
     StreamingTextResponse,
@@ -18,18 +14,11 @@ import { CharacterTextSplitter } from 'langchain/text_splitter';
 const loader = new JSONLoader(
     "src/data/states.json",
     [
-        "/services/*/name",           // Load names of all services
-        "/services/*/description",    // Load descriptions of all services
-        "/booking/online",            // Load the online booking URL
-        "/booking/phone",             // Load the phone number
-        "/booking/text",              // Load the text number
-        "/memberships/*/name",        // Load names of all memberships
-        "/memberships/*/description", // Load descriptions of all memberships
-        "/promotions/*/name",         // Load names of all promotions
-        "/promotions/*/description",  // Load descriptions of all promotions
-        "/contact_information/email", // Load the contact email
-        "/contact_information/address", // Load the physical address
-        "/contact_information/name" // business name
+        "/services",           // Load names of all services
+        "/booking",            // Load the online booking URL
+        "/memberships",
+        "/promotions",         
+        "/contact_information", // Load the contact email
     ]
 );
 
@@ -43,7 +32,7 @@ const formatMessage = (message) => {
     return `${message.role}: ${message.content}`;
 };
 
-const TEMPLATE = `Answer the user's questions based on the following context:
+const TEMPLATE = `You are the AI customer support bot for the Skin Clinic Med Spa. Answer the user's questions based on the following context:
 ==============================
 Context: {context}
 ==============================
