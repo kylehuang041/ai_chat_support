@@ -2,7 +2,7 @@
 
 We created an AI customer support bot for a business that can chat with a customer using OpenAI and Langchain for RAG.
 
-Link: https://ai-chat-support-lac.vercel.app/
+Link: https://ai-chat-support-sigma.vercel.app/
 
 ## Team Members
 
